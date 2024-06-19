@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 public class StringContainer implements Serializable {
-    private transient Node head;
+    private Node head;
     private int size;
     private Pattern pattern;
     private boolean duplicatedNotAllowed;
@@ -28,6 +28,9 @@ public class StringContainer implements Serializable {
     }
 
     public void add(String value) {
+        if (value == null) {
+            throw new InvalidStringContainerValueException("Null value not allowed");
+        }
         Matcher matcher = pattern.matcher(value);
         if (!matcher.matches()) {
             throw new InvalidStringContainerValueException("Invalid value: " + value);
@@ -76,6 +79,9 @@ public class StringContainer implements Serializable {
     }
 
     public void remove(String value) {
+        if (value == null) {
+            throw new InvalidStringContainerValueException("Null value not allowed");
+        }
         if (head == null) {
             throw new InvalidStringContainerValueException("Value not found: " + value);
         }
@@ -138,35 +144,5 @@ public class StringContainer implements Serializable {
             e.printStackTrace();
         }
         return null;
-    }
-
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        out.defaultWriteObject();
-        Node current = head;
-        while (current != null) {
-            out.writeObject(current.value);
-            out.writeObject(current.timestamp);
-            current = current.next;
-        }
-        out.writeObject(null);
-    }
-
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        Node previous = null;
-        while (true) {
-            String value = (String) in.readObject();
-            if (value == null) {
-                break;
-            }
-            LocalDateTime timestamp = (LocalDateTime) in.readObject();
-            Node current = new Node(value, timestamp);
-            if (previous == null) {
-                head = current;
-            } else {
-                previous.next = current;
-            }
-            previous = current;
-        }
     }
 }

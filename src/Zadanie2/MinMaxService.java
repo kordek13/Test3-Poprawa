@@ -8,19 +8,26 @@ public class MinMaxService {
             throw new IllegalArgumentException("List cannot be null or empty");
         }
 
-        T min = elements.get(0);
-        T max = elements.get(0);
+        T min = null;
+        T max = null;
 
         for (T element : elements) {
-            if (element.compareTo(min) < 0) {
-                min = element;
+            if (element != null) {
+                if (min == null || element.compareTo(min) < 0) {
+                    min = element;
+                }
+                if (max == null || element.compareTo(max) > 0) {
+                    max = element;
+                }
             }
-            if (element.compareTo(max) > 0) {
-                max = element;
-            }
+        }
+
+        if (min == null || max == null) {
+            throw new IllegalArgumentException("List cannot contain only null elements");
         }
 
         return new MinMax<>(min, max);
     }
 }
+
 
